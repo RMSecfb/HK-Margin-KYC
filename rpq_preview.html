@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>客戶投資風險取向分析問卷 | Fubon Securities</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Microsoft JhengHei", "PingFang TC", Arial, sans-serif; background:#f0f2f6; color:#262730; display:flex; min-height:100vh; }
+  .sidebar { width:290px; background:#f8f9fb; border-right:1px solid #e0e0e0; padding:1.2rem 1rem; flex-shrink:0; position:sticky; top:0; height:100vh; overflow-y:auto; }
+  .sidebar h3 { font-size:.95rem; margin-bottom:.6rem; color:#1F4E79; }
+  .sidebar label { display:block; font-size:.8rem; color:#555; margin-top:.7rem; margin-bottom:.25rem; }
+  .sidebar input,.sidebar select { width:100%; padding:.45rem .6rem; border:1px solid #ccc; border-radius:6px; font-size:.85rem; background:white; }
+  .sidebar hr { border:none; border-top:1px solid #ddd; margin:1rem 0; }
+  .progress-bar { background:#e0e0e0; border-radius:8px; height:10px; margin:.4rem 0; overflow:hidden; }
+  .progress-fill { background:#2E75B6; height:100%; width:0%; border-radius:8px; transition:width .3s; }
+  .score-box { background:#FFF2CC; border-radius:8px; padding:.5rem .7rem; font-size:.85rem; margin-top:.4rem; }
+  .score-box.done { background:#C6EFCE; }
+  .rule-table { width:100%; font-size:.75rem; border-collapse:collapse; margin-top:.4rem; }
+  .rule-table th,.rule-table td { border:1px solid #ddd; padding:.25rem .4rem; text-align:left; }
+  .rule-table th { background:#e8eef5; }
+  .main { flex:1; padding:1.2rem 1.5rem 2rem; max-width:1000px; }
+  .header { background:linear-gradient(90deg,#1F4E79 0%,#2E75B6 100%); color:white; padding:1.2rem 1.5rem; border-radius:10px; margin-bottom:1rem; }
+  .header h1 { font-size:1.45rem; margin-bottom:.25rem; }
+  .header h2 { font-size:1.1rem; font-weight:400; margin-bottom:.3rem; }
+  .header p { font-size:.85rem; opacity:.9; }
+  .info-banner { background:#e8f0fe; border-left:4px solid #2E75B6; padding:.7rem 1rem; border-radius:0 6px 6px 0; font-size:.9rem; margin-bottom:1rem; }
+  .section-title { background:#2E75B6; color:white; padding:.45rem 1rem; border-radius:6px; font-weight:600; font-size:.95rem; margin:1.1rem 0 .6rem; }
+  .q-row { display:flex; align-items:flex-start; gap:.8rem; margin-bottom:.9rem; padding-bottom:.6rem; border-bottom:1px solid #eee; }
+  .q-content { flex:1; }
+  .q-label { font-weight:600; font-size:.92rem; margin-bottom:.35rem; }
+  .q-content select { width:100%; padding:.5rem .7rem; border:1px solid #ccc; border-radius:6px; font-size:.88rem; background:#fffef5; }
+  .q-hint { font-size:.78rem; color:#888; margin-top:.25rem; }
+  .q-score { width:60px; text-align:center; padding-top:1.6rem; font-size:.85rem; color:#999; }
+  .badge { display:inline-block; background:#1F4E79; color:white; padding:.15rem .55rem; border-radius:12px; font-weight:bold; font-size:.85rem; }
+  .result-box { background:#FCE4D6; border:2px solid #1F4E79; border-radius:10px; padding:1.2rem; margin:1rem 0; }
+  .result-box h3 { margin-bottom:.4rem; }
+  .result-box .grade { font-size:1.35rem; font-weight:700; color:#1F4E79; }
+  .check { padding:.55rem .9rem; border-radius:6px; margin:.35rem 0; font-size:.88rem; }
+  .check-pending { background:#FFF2CC; color:#7F6000; }
+  .check-ok { background:#C6EFCE; color:#006100; }
+  .check-warn { background:#FFC7CE; color:#9C0006; }
+  .confirm-box { margin-top:1.2rem; padding-top:.8rem; border-top:1px solid #ddd; }
+  .confirm-box h3 { margin-bottom:.5rem; }
+  .confirm-box p { font-size:.88rem; margin-bottom:.3rem; }
+  .warn-banner { background:#FFF2CC; border-radius:6px; padding:.6rem 1rem; font-size:.9rem; color:#7F6000; margin-bottom:.8rem; }
+  .credit-box { background:#EEF5FB; border:1px solid #9CC2E5; border-radius:10px; padding:1rem 1.2rem; margin:.8rem 0; }
+  .credit-grid { display:grid; grid-template-columns:1fr 1fr; gap:.8rem; margin-top:.7rem; }
+  .field label { display:block; font-size:.82rem; color:#555; margin-bottom:.25rem; }
+  .field input { width:100%; padding:.5rem .7rem; border:1px solid #ccc; border-radius:6px; font-size:.88rem; }
+  .footer { margin-top:1.5rem; font-size:.75rem; color:#888; border-top:1px solid #ddd; padding-top:.7rem; }
+  .hidden { display:none !important; }
+  @media (max-width:800px) {
+    body { display:block; }
+    .sidebar { width:100%; height:auto; position:relative; }
+    .main { padding:1rem; }
+    .credit-grid { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+  <aside class="sidebar">
+    <h3>📋 問卷資訊</h3>
+    <label>帳戶號碼 Account No.</label>
+    <input type="text" id="accNo" placeholder="請輸入帳戶號碼">
+    <label>客戶名稱 Account Name</label>
+    <input type="text" id="accName" placeholder="請輸入客戶名稱">
+    <label>帳戶類型 Account Type</label>
+    <select id="accountType" onchange="updateAll()">
+      <option value="individual">個人 Individual</option>
+      <option value="joint">聯名 Joint</option>
+    </select>
+    <div id="jointGradeWrap" class="hidden">
+      <label>其他聯名戶最高 RPQ 等級</label>
+      <select id="jointOtherGrade" onchange="updateAll()">
+        <option value="">未提供</option><option>G1</option><option>G2</option><option>G3</option><option>G4</option>
+      </select>
+      <div style="font-size:.72rem;color:#888;margin-top:.3rem;">內規暫定：聯名帳戶採較高投資風險取向。</div>
+    </div>
+    <label>填寫日期 Date</label>
+    <input type="date" id="fillDate">
+    <hr>
+    <h3>📊 即時進度</h3>
+    <div id="progressText" style="font-size:.85rem;">已完成 0 / 15 題</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="score-box" id="scoreBox">目前得分：0（尚缺 15 題）</div>
+    <hr>
+    <h3>📖 計分規則</h3>
+    <div style="font-size:.78rem;color:#555;">A=1　B=2　C=3　D=4　E=5</div>
+    <div style="font-size:.75rem;color:#777;margin:.2rem 0;">總分 = 15 題加總（最低15，最高75）</div>
+    <table class="rule-table">
+      <tr><th>等級</th><th>分數範圍</th></tr>
+      <tr><td>G1 低風險</td><td>15–30</td></tr>
+      <tr><td>G2 中風險</td><td>31–45</td></tr>
+      <tr><td>G3 高風險</td><td>46–60</td></tr>
+      <tr><td>G4 極高風險</td><td>61–75</td></tr>
+    </table>
+    <hr>
+    <div style="font-size:.72rem;color:#999;">RPQ Prototype v1 · 2026/09</div>
+  </aside>
+
+  <main class="main">
+    <div class="header">
+      <h1>富邦證券 Fubon Securities</h1>
+      <h2>客戶投資風險取向分析問卷 (個人/聯名)</h2>
+      <p>Client Investment Risk Preference Questionnaire (Individual/Joint Account)</p>
+    </div>
+    <div class="info-banner">請依序回答以下 <strong>15</strong> 題。全部完成後顯示 RPQ 結果；一致性檢核僅作提醒，不會改變 RPQ 分數。</div>
+
+    <div class="section-title">I. 基本資料 Basic Information</div>
+
+    <div class="q-row"><div class="q-content"><div class="q-label">Q1. 年齡 Age</div><select id="q1" onchange="updateAll()"><option value="">— 請選擇 —</option><option value="A">A. ≥65歲或以上</option><option value="B">B. 52-64歲</option><option value="C">C. 39-51歲</option><option value="D">D. 26-38歲</option><option value="E">E. 18-25歲</option></select><div class="q-hint">💡 內規：若選 A（≥65歲），需辦理獨立第三方見證簽署。</div></div><div class="q-score" id="s1">未填</div></div>
+    <div class="q-row"><div class="q-content"><div class="q-label">Q2. 教育程度 Education Level</div><select id="q2" onchange="updateAll()"><option value="">— 請選擇 —</option><option value="A">A. 小學/國小(含以下)</option><option value="B">B. 中學/國中</option><option value="C">C. 高職/高中</option><option value="D">D. 專科/大學</option><option value="E">E. 碩士/博士</option></select></div><div class="q-score" id="s2">未填</div></div>
+    <div class="q-row"><div class="q-content"><div class="q-label">Q3. 每年收入(港幣) Annual Income (HK$)</div><select id="q3" onchange="updateAll()"><option value="">— 請選擇 —</option><option value="A">A. ≤$200,000</option><option value="B">B. $200,001-$500,000</option><option value="C">C. $500,001-$1,000,000</option><option value="D">D. $1,000,001-$5,000,000</option><option value="E">E. >$5,000,000</option></select></div><div class="q-score" id="s3">未填</div></div>
+    <div class="q-row"><div class="q-content"><div class="q-label">Q4. 流動資產(港幣，不含自住物業) Liquid Assets (HK$)</div><select id="q4" onchange="updateAll()"><option value="">— 請選擇 —</option><option value="A">A. ≤$200,000</option><option value="B">B. $200,001-$500,000</option><option value="C">C. $500,001-$1,000,000</option><option value="D">D. $1,000,001-$5,000,000</option><option value="E">E. >$5,000,000</option></select></div><div class="q-score" id="s4">未填</div></div>
+    <div class="q-row"><div class="q-content"><div class="q-label">Q5. 淨資產總額(港元) Total Net Worth (HK$)</div><select id="q5" onchange="updateAll()"><option value="">— 請選擇 —</option><option value="A">A. ≤$200,000</option><option value="B">B. $200,001-$500,000</option><option value="C">C. $500,001-$1,000,000</option><option value="D">D. $1,000,001-$5,000,000</option><option value="E">E. >$5,000,000</option></select></div><div class="q-score" id="s5">未填</div></div>
+    <div class="q-row"><div class="q-content"><div class="q-label">Q6. 預期動用流動資產作投資的百分比 % of Liquid Assets for Investment</div><select id="q6" onchange="updateAll()"><option value="">— 請選擇 —</option><option value="A">A. &lt;10%</option><option value="B">B. 10%-&lt;20%</option><option value="C">C. 20%-&lt;30%</option><option value="D">D. 30%-40%</option><option value="E">E. &gt;40%</option></select></div><div class="q-score" id="s6">未填</div></div>
+
+    <div class="section-title">II. 一般投資目的 General Investment Goal</div>
+    <div class="q-row"><div class="q-content"><div class="q-label">Q7. 投資目的 Investment Goal</div><select id="q7" onchange="updateAll()"><option value="">— 請選擇 —</option><option value="A">A. 要求保本</option><option value="B">B. 獲取高於定存的報酬</option><option value="C">C. 資產穩健增長</option><option value="D">D. 資產快速增長</option><option value="E">E. 迅速獲得短期資本利得</option></select></div><div class="q-score" id="s7">未填</div></div>
+    <div class="q-row"><div class="q-content"><div class="q-label">Q8. 期望的投資報酬率 Expected Investment Return</div><select id="q8" onchange="updateAll()"><option value="">— 請選擇 —</option><option value="A">A. &lt;5%</option><option value="B">B. 5%-&lt;15%</option><option value="C">C. 15%-&lt;25%</option><option value="D">D. 25%-35%</option><option value="E">E. &gt;35%</option></select></div><div class="q-score" id="s8">未填</div></div>
+    <div class="q-row"><div class="q-content"><div class="q-label">Q9. 可承受的投資損失 Tolerance of Investment Loss</div><select id="q9" onchange="updateAll()"><option value="">— 請選擇 —</option><option value="A">A. 0%</option><option value="B">B. &gt;0%-&lt;5%</option><option value="C">C. 5%-&lt;15%</option><option value="D">D. 15%-25%</option><option value="E">E. &gt;25%</option></select></div><div class="q-score" id="s9">未填</div></div>
+    <div class="q-row"><div class="q-content"><div class="q-label">Q10. 可接受的投資期限 Investment Horizon</div><select id="q10" onchange="updateAll()"><option value="">— 請選擇 —</option><option value="A">A. &lt;1年</option><option value="B">B. 1年-&lt;3年</option><option value="C">C. 3年-&lt;5年</option><option value="D">D. 5-10年</option><option value="E">E. &gt;10年</option></select></div><div class="q-score" id="s10">未填</div></div>
+
+    <div class="section-title">III. 投資經驗 Investment Experience</div>
+    <div class="q-row"><div class="q-content"><div class="q-label">Q11. 金融市場專業知識與投資交易經驗 Knowledge of Financial Markets</div><select id="q11" onchange="updateAll()"><option value="">— 請選擇 —</option><option value="A">A. 無認識</option><option value="B">B. 低水平(基本認識債券/股票)</option><option value="C">C. 中等水平(了解分散投資)</option><option value="D">D. 高水平(能閱讀財報)</option><option value="E">E. 精通(熟悉大部分金融商品)</option></select></div><div class="q-score" id="s11">未填</div></div>
+    <div class="q-row"><div class="q-content"><div class="q-label">Q12. 曾持有的投資產品經驗 Experience in Investment Products（選最高等級）</div><select id="q12" onchange="updateAll()"><option value="">— 請選擇 —</option><option value="A">A. 現金/存款/保本產品/港府債券</option><option value="B">B. 一般掛牌股票/非複雜債券/債券基金</option><option value="C">C. 外幣/非保本貨幣掛鈎結構性產品</option><option value="D">D. 股票/開放式基金/商品/實體ETF等</option><option value="E">E. 衍生性產品/期權/期貨/窩輪/牛熊證/對沖基金等</option></select><div class="q-hint">💡 Q12 產品分級沿用 v0 原始內容，待業務/Compliance確認。</div></div><div class="q-score" id="s12">未填</div></div>
+    <div class="q-row"><div class="q-content"><div class="q-label">Q13. 投資經驗年數 Years of Investment Experience</div><select id="q13" onchange="updateAll()"><option value="">— 請選擇 —</option><option value="A">A. 沒有經驗/&lt;1年</option><option value="B">B. 1-2年</option><option value="C">C. 3-5年</option><option value="D">D. 6-10年</option><option value="E">E. ≥11年</option></select></div><div class="q-score" id="s13">未填</div></div>
+    <div class="q-row"><div class="q-content"><div class="q-label">Q14. 使用孖展(融資)買賣股票/外匯經驗 Margin Facilities Experience</div><select id="q14" onchange="updateAll()"><option value="">— 請選擇 —</option><option value="A">A. 沒有經驗/&lt;1年</option><option value="B">B. 1-2年</option><option value="C">C. 3-5年</option><option value="D">D. 6-10年</option><option value="E">E. ≥11年</option></select></div><div class="q-score" id="s14">未填</div></div>
+    <div class="q-row"><div class="q-content"><div class="q-label">Q15. 對未獲證監會認可結構性票據/基金或非上市定息債券的投資意願</div><select id="q15" onchange="updateAll()"><option value="">— 請選擇 —</option><option value="A">A. 不放心(只考慮認可及上市)</option><option value="B">B. 只考慮良好背景發行人</option><option value="C">C. 考慮有良好表現的產品</option><option value="D">D. 可考慮私募/非認可基金/對沖基金等</option><option value="E">E. 可考慮所有產品包括非保本結構性票據</option></select></div><div class="q-score" id="s15">未填</div></div>
+
+    <div style="margin-top:1.5rem;"><h3 style="margin-bottom:.6rem;">📈 投資風險取向分析結果</h3><div id="resultArea"><div class="warn-banner">⚠ 尚有 <span id="remainCount">15</span> 題未填，請完成所有題目後再查看最終風險等級。</div></div></div>
+
+    <h3 style="margin:1.2rem 0 .5rem;">🛡 相互防呆檢核 Consistency Checks</h3>
+    <div id="check1" class="check check-pending">檢核1：— 請先填寫年齡</div>
+    <div id="check2" class="check check-pending">檢核2：— 請先填寫流動資產與淨資產</div>
+    <div id="check3" class="check check-pending">檢核3：— 請先填寫投資目的與知識水平</div>
+    <div id="check4" class="check check-pending">檢核4：— 請先填寫期望報酬與可承受損失</div>
+    <div id="check5" class="check check-pending">檢核5：— 請先填寫產品經驗與孖展經驗</div>
+    <div style="font-size:.78rem;color:#777;margin-top:.4rem;">一致性檢核僅作提醒，不會自動調整 RPQ 分數或風險等級。</div>
+
+    <div id="consistencyAckWrap" class="confirm-box hidden"><label style="display:flex;gap:.4rem;align-items:flex-start;font-size:.9rem;"><input type="checkbox" id="consistencyAck"> 已向客戶確認上述一致性提醒，客戶確認原填答內容無誤</label></div>
+    <div id="witnessAckWrap" class="confirm-box hidden"><label style="display:flex;gap:.4rem;align-items:flex-start;font-size:.9rem;"><input type="checkbox" id="witnessAck"> 已確認本案需依內規辦理獨立第三方見證</label></div>
+
+    <div class="section-title">Margin / Credit Information（獨立揭露）</div>
+    <div class="info-banner">本區為融資/信用資訊揭露，<strong>不參與 RPQ 計分，也不由 RPQ 等級推導</strong>。正式資料應來自核准的 Credit / Margin 系統或授信政策。</div>
+    <div class="credit-grid">
+      <div class="field"><label>融資額度 Margin Facility Amount (HK$)</label><input type="number" min="0" step="10000" id="marginFacility" value="0" oninput="updateCredit()"></div>
+      <div class="field"><label>Credit Limit (HK$)</label><input type="number" min="0" step="10000" id="creditLimit" value="0" oninput="updateCredit()"></div>
+      <div class="field"><label>已動用額度 Used Amount (HK$)</label><input type="number" min="0" step="10000" id="usedAmount" value="0" oninput="updateCredit()"></div>
+      <div class="field"><label>額度資料日期 Credit Data Date</label><input type="date" id="creditDataDate"></div>
+    </div>
+    <div class="credit-box"><b>可用額度 Available Limit：</b> HK$ <span id="availableLimit">0</span><br><span style="font-size:.82rem;color:#666;">計算：Credit Limit − Used Amount；僅供畫面揭露。</span></div>
+    <div class="field"><label>額度資料來源 / 備註 Credit Source / Note</label><input type="text" id="creditSource" placeholder="例如：Credit system / approved limit file"></div>
+    <div id="creditWarn" class="check check-warn hidden"></div>
+
+    <div class="confirm-box">
+      <h3>✅ 客戶確認 Client Confirmation</h3>
+      <p>1. 本人/吾等確認上述投資風險取向分析的結果正確反映本人的投資風險取向。</p>
+      <p>2. 本人/吾等明白上述投資風險取向分析的結果將取代本人/吾等於開戶表之答案。</p>
+      <p>3. Margin / Credit Information 為獨立揭露資訊，不屬於 RPQ 計分結果。</p>
+      <label style="display:flex;align-items:center;gap:.4rem;margin-top:.6rem;font-size:.9rem;"><input type="checkbox" id="confirmCb"> 本人確認以上內容正確無誤</label>
+      <div id="finalStatus" style="margin-top:.7rem;font-size:.88rem;color:#666;"></div>
+    </div>
+
+    <div class="footer">本問卷分析結果僅供風險屬性評估使用；公司保留依內部政策及適用規範進行最終審核之權利。聯名帳戶暫依內規採較高投資風險取向。<br>RPQ Prototype v1 · Fubon Securities (Hong Kong) Limited</div>
+  </main>
+
+<script>
+const SCORE={A:1,B:2,C:3,D:4,E:5};
+const GRADE_ORDER={G1:1,G2:2,G3:3,G4:4};
+function rank(v){return SCORE[v]||0;}
+function getGrade(t){if(t<=30)return{code:'G1',desc:'低風險 / Low Risk / 保守型 (Grade 1)'};if(t<=45)return{code:'G2',desc:'中風險 / Medium Risk / 平穩型 (Grade 2)'};if(t<=60)return{code:'G3',desc:'高風險 / High Risk / 進取型 (Grade 3)'};return{code:'G4',desc:'極高風險 / Aggressive High Risk / 積極型 (Grade 4)'};}
+function higherGrade(a,b){if(!b)return a;return GRADE_ORDER[b]>GRADE_ORDER[a]?b:a;}
+function setCheck(id,pending,pendingMsg,warn,warnMsg,okMsg){const el=document.getElementById(id);const prefix=id.replace('check','檢核')+'：';if(pending){el.className='check check-pending';el.textContent=prefix+pendingMsg;return false;}if(warn){el.className='check check-warn';el.textContent=prefix+warnMsg;return true;}el.className='check check-ok';el.textContent=prefix+okMsg;return false;}
+function updateAll(){
+  let total=0,filled=0;
+  for(let i=1;i<=15;i++){const v=document.getElementById('q'+i).value;const s=document.getElementById('s'+i);if(v){filled++;total+=SCORE[v];s.innerHTML='<span class="badge">'+SCORE[v]+' 分</span>';}else{s.textContent='未填';}}
+  document.getElementById('progressText').textContent='已完成 '+filled+' / 15 題';
+  document.getElementById('progressFill').style.width=(filled/15*100)+'%';
+  const box=document.getElementById('scoreBox');
+  if(filled===15){const g=getGrade(total);box.className='score-box done';box.textContent='總分：'+total+' → '+g.code;}else{box.className='score-box';box.textContent='目前得分：'+total+'（尚缺 '+(15-filled)+' 題）';}
+
+  const accountType=document.getElementById('accountType').value;
+  document.getElementById('jointGradeWrap').classList.toggle('hidden',accountType!=='joint');
+  const ra=document.getElementById('resultArea');
+  if(filled<15){ra.innerHTML='<div class="warn-banner">⚠ 尚有 '+(15-filled)+' 題未填，請完成所有題目後再查看最終風險等級。</div>';}
+  else{
+    const g=getGrade(total);const colors={G1:'#548235',G2:'#BF8F00',G3:'#C65911',G4:'#C00000'};
+    let jointHtml='';
+    if(accountType==='joint'){
+      const other=document.getElementById('jointOtherGrade').value;
+      if(other){jointHtml='<div class="info-banner" style="margin-top:.8rem;">內規：本份 RPQ 為 <strong>'+g.code+'</strong>；其他聯名戶最高等級為 <strong>'+other+'</strong>；帳戶適用風險等級取較高者 → <strong>'+higherGrade(g.code,other)+'</strong>。</div>';}
+      else{jointHtml='<div class="warn-banner" style="margin-top:.8rem;">此為聯名帳戶，但尚未提供其他聯名戶 RPQ 等級；請另行完成其 RPQ 後再依內規取較高等級。</div>';}
+    }
+    ra.innerHTML='<div class="result-box"><h3>總分 Total Score：<span style="color:#1F4E79;font-size:1.4rem;">'+total+'</span> / 75</h3><div class="grade" style="color:'+colors[g.code]+';">'+g.code+'　'+g.desc+'</div><p style="margin-top:.6rem;color:#666;font-size:.85rem;">評分對照：G1 15–30　|　G2 31–45　|　G3 46–60　|　G4 61–75</p></div>'+jointHtml;
+  }
+
+  const q1=document.getElementById('q1').value,q4=document.getElementById('q4').value,q5=document.getElementById('q5').value,q7=document.getElementById('q7').value,q8=document.getElementById('q8').value,q9=document.getElementById('q9').value,q11=document.getElementById('q11').value,q12=document.getElementById('q12').value,q14=document.getElementById('q14').value;
+  setCheck('check1',!q1,'— 請先填寫年齡',q1==='A','⚠ 內規提醒：客戶年齡 ≥65 歲，需辦理獨立第三方見證簽署並確認問卷內容','✓ 年齡未達內規第三方見證門檻');
+  const warnings=[];
+  if(setCheck('check2',!q4||!q5,'— 請先填寫流動資產與淨資產',rank(q4)>rank(q5),'⚠ 流動資產等級高於淨資產等級，請確認填寫是否合理','✓ 流動資產與淨資產等級大致一致'))warnings.push(2);
+  if(setCheck('check3',!q7||!q11,'— 請先填寫投資目的與知識水平',rank(q7)>=4&&rank(q11)<=2,'⚠ 投資目的較進取但市場知識較低，請向客戶確認','✓ 投資目的與知識水平未觸發提醒'))warnings.push(3);
+  if(setCheck('check4',!q8||!q9,'— 請先填寫期望報酬與可承受損失',rank(q8)>=4&&rank(q9)<=2,'⚠ 期望報酬較高但可承受損失偏低，請向客戶確認','✓ 期望報酬與損失承受度未觸發提醒'))warnings.push(4);
+  if(setCheck('check5',!q12||!q14,'— 請先填寫產品經驗與孖展經驗',rank(q14)>=3&&rank(q12)<=2,'⚠ 有較長孖展經驗但產品經驗顯示較基礎，請向客戶確認','✓ 孖展經驗與產品經驗未觸發提醒'))warnings.push(5);
+  document.getElementById('consistencyAckWrap').classList.toggle('hidden',warnings.length===0);
+  document.getElementById('witnessAckWrap').classList.toggle('hidden',q1!=='A');
+  updateFinalStatus();
+}
+function updateCredit(){
+  const margin=Number(document.getElementById('marginFacility').value||0),limit=Number(document.getElementById('creditLimit').value||0),used=Number(document.getElementById('usedAmount').value||0);const avail=Math.max(limit-used,0);document.getElementById('availableLimit').textContent=avail.toLocaleString('en-US',{maximumFractionDigits:0});
+  const warn=document.getElementById('creditWarn');let msgs=[];if(limit>0&&used>limit)msgs.push('已動用額度高於 Credit Limit');if(limit>0&&margin>limit)msgs.push('融資額度高於 Credit Limit');if(msgs.length){warn.textContent='⚠ '+msgs.join('；')+'，請確認來源資料。此提醒不影響 RPQ 結果。';warn.classList.remove('hidden');}else{warn.classList.add('hidden');}
+}
+function updateFinalStatus(){
+  const filled=[...Array(15)].filter((_,i)=>document.getElementById('q'+(i+1)).value).length;
+  const confirmed=document.getElementById('confirmCb').checked;
+  const needConsistency=!document.getElementById('consistencyAckWrap').classList.contains('hidden');
+  const consistencyOk=!needConsistency||document.getElementById('consistencyAck').checked;
+  const needWitness=!document.getElementById('witnessAckWrap').classList.contains('hidden');
+  const witnessOk=!needWitness||document.getElementById('witnessAck').checked;
+  const el=document.getElementById('finalStatus');
+  if(filled<15){el.textContent='尚未完成全部題目。';return;}if(!confirmed){el.textContent='RPQ 結果已產生；勾選客戶確認後可完成最終紀錄。';return;}if(!consistencyOk){el.textContent='RPQ 結果已產生；請完成一致性提醒確認。';return;}if(!witnessOk){el.textContent='RPQ 結果已產生；請確認 ≥65 歲內規第三方見證事項。';return;}el.textContent='✓ 問卷已完成並確認。';
+}
+['confirmCb','consistencyAck','witnessAck'].forEach(id=>document.getElementById(id).addEventListener('change',updateFinalStatus));
+const today=new Date().toISOString().slice(0,10);document.getElementById('fillDate').value=today;document.getElementById('creditDataDate').value=today;updateAll();updateCredit();
+</script>
+</body>
+</html>
