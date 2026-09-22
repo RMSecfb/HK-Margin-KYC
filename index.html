@@ -133,6 +133,30 @@
   .empty-state { padding:35px; text-align:center; color:var(--muted); }
   .footer { margin-top:18px; color:#8a9099; font-size:.75rem; line-height:1.5; text-align:center; }
 
+  /* Printable report */
+  #printReport { display:none; }
+  .print-report { color:#111; background:#fff; }
+  .print-report h1 { font-size:18pt; margin:0 0 4px; }
+  .print-report .print-sub { font-size:10pt; color:#555; margin-bottom:14px; }
+  .print-report h2 { font-size:12pt; margin:16px 0 7px; padding-bottom:4px; border-bottom:1px solid #aaa; }
+  .print-report table { width:100%; border-collapse:collapse; font-size:9.5pt; }
+  .print-report th,.print-report td { border:1px solid #bbb; padding:5px 6px; vertical-align:top; }
+  .print-report th { background:#f2f2f2; position:static; }
+  .print-report .print-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px 18px; font-size:10pt; }
+  .print-report .print-box { border:1px solid #aaa; padding:8px 10px; margin:6px 0; }
+  .print-report .print-note { font-size:8.5pt; color:#555; margin-top:14px; }
+
+  @media print {
+    @page { size:A4; margin:12mm; }
+    body { background:#fff !important; }
+    body > .view { display:none !important; }
+    #printReport { display:block !important; }
+    .print-report { font-family:"Microsoft JhengHei","PingFang TC",Arial,sans-serif; }
+    .print-report h2, .print-report .print-box { break-inside:avoid; }
+    .print-report table { page-break-inside:auto; }
+    .print-report tr { break-inside:avoid; break-after:auto; }
+  }
+
   @media (max-width:860px) {
     .role-grid,.summary-grid,.result-grid,.credit-grid { grid-template-columns:1fr; }
     .customer-shell { display:block; }
@@ -196,8 +220,8 @@
 
     <main class="customer-main">
       <div class="customer-header">
-        <h1>客戶投資風險取向分析問卷</h1>
-        <p>Client Investment Risk Preference Questionnaire (Individual / Joint Account)</p>
+        <h1>富邦證券（香港）客戶投資風險取向分析問卷</h1>
+        <p>Client Investment Risk Preference Questionnaire</p>
       </div>
       <div class="notice notice-info">請依實際情況完成以下 15 題。每題皆為必填；問卷送出後將交由公司人員進行後續審閱。</div>
       <div id="customerQuestionContainer"></div>
@@ -255,7 +279,7 @@
 <!-- Company -->
 <section id="companyView" class="view">
   <div class="brand-bar">
-    <div class="brand">富邦證券 Fubon Securities — RPQ 公司審閱版</div>
+    <div class="brand">富邦證券（香港）客戶投資風險取向分析問卷— 公司審閱版</div>
     <div class="sub">Company Review Portal · Prototype</div>
   </div>
   <div class="company-shell">
@@ -347,7 +371,7 @@
         <div id="reviewSavedHint" style="font-size:.78rem;color:var(--muted);margin-top:8px;"></div>
         <div class="review-actions">
           <button class="btn btn-primary" onclick="saveCompanyReview(true)">儲存覆核</button>
-          <button class="btn btn-secondary" onclick="downloadSummary()">下載結果摘要 TXT</button>
+          <button class="btn btn-secondary" onclick="printSummary()">列印 / 儲存 PDF</button>
           <button class="btn btn-danger" onclick="clearLocalCase()">清除本機案件</button>
         </div>
       </div>
@@ -356,6 +380,9 @@
     <div class="footer">Prototype v2 · 客戶端不顯示任何分數或風險等級。正式上線前須改用公司核准之登入、資料庫、權限及 Audit Trail 機制。</div>
   </div>
 </section>
+
+<!-- Native browser print/PDF report -->
+<section id="printReport" class="print-report"></section>
 
 <script>
 const COMPANY_PASSWORD = 'RPQ2026'; // Prototype only. 正式上線不可把密碼寫在前端。
@@ -385,7 +412,7 @@ const QUESTIONS = [
   {id:9,section:'II. 一般投資目的 General Investment Goal',text:'可承受的投資損失 Tolerance of Investment Loss',options:[['A','0%'],['B','>0%-<5%'],['C','5%-<15%'],['D','15%-25%'],['E','>25%']]},
   {id:10,section:'II. 一般投資目的 General Investment Goal',text:'可接受的投資期限 Investment Horizon',options:[['A','<1年'],['B','1年-<3年'],['C','3年-<5年'],['D','5-10年'],['E','>10年']]},
   {id:11,section:'III. 投資經驗 Investment Experience',text:'金融市場專業知識與投資交易經驗 Knowledge of Financial Markets',options:[['A','無認識'],['B','低水平(基本認識債券/股票)'],['C','中等水平(了解分散投資)'],['D','高水平(能閱讀財報)'],['E','精通(熟悉大部分金融商品)']]},
-  {id:12,section:'III. 投資經驗 Investment Experience',text:'曾持有的投資產品經驗 Experience in Investment Products（選最高等級）',options:[['A','現金/存款/保本產品/港府債券'],['B','一般掛牌股票/非複雜債券/債券基金'],['C','外幣/非保本貨幣掛鈎結構性產品'],['D','股票/開放式基金/商品/實體ETF等'],['E','衍生性產品/期權/期貨/窩輪/牛熊證/對沖基金等']]},
+  {id:12,section:'III. 投資經驗 Investment Experience',text:'曾持有的投資產品經驗 Experience in Investment Products（選最高等級）',options:[['A','無投資商品'],['B','現金/存款/保本產品/港府債券'],['C','一般掛牌股票/開放式基金/非複雜債券/債券基金/商品/實體ETF等'],['D','外幣/非保本貨幣掛鈎結構性產品'],['E','衍生性產品/期權/期貨/窩輪/牛熊證/對沖基金等']]},
   {id:13,section:'III. 投資經驗 Investment Experience',text:'投資經驗年數 Years of Investment Experience',options:[['A','沒有經驗/<1年'],['B','1-2年'],['C','3-5年'],['D','6-10年'],['E','≥11年']]},
   {id:14,section:'III. 投資經驗 Investment Experience',text:'使用孖展(融資)買賣股票/外匯經驗 Margin Facilities Experience',options:[['A','沒有經驗/<1年'],['B','1-2年'],['C','3-5年'],['D','6-10年'],['E','≥11年']]},
   {id:15,section:'III. 投資經驗 Investment Experience',text:'對未獲證監會認可結構性票據/基金或非上市定息債券的投資意願',options:[['A','不放心(只考慮認可及上市)'],['B','只考慮良好背景發行人'],['C','考慮有良好表現的產品'],['D','可考慮私募/非認可基金/對沖基金等'],['E','可考慮所有產品包括非保本結構性票據']]}
@@ -528,7 +555,7 @@ function getChecks(sub){
   if(rank(a[4])>rank(a[5])){ const t='檢核2：流動資產等級高於淨資產等級，請確認填寫是否合理。'; checks.push({type:'warn',text:t}); consistency.push(t); } else checks.push({type:'ok',text:'檢核2：流動資產與淨資產等級未觸發提醒。'});
   if(rank(a[7])>=4&&rank(a[11])<=2){ const t='檢核3：投資目的較進取但市場知識較低，請向客戶確認。'; checks.push({type:'warn',text:t}); consistency.push(t); } else checks.push({type:'ok',text:'檢核3：投資目的與知識水平未觸發提醒。'});
   if(rank(a[8])>=4&&rank(a[9])<=2){ const t='檢核4：期望報酬較高但可承受損失偏低，請向客戶確認。'; checks.push({type:'warn',text:t}); consistency.push(t); } else checks.push({type:'ok',text:'檢核4：期望報酬與損失承受度未觸發提醒。'});
-  if(rank(a[14])>=3&&rank(a[12])<=2){ const t='檢核5：有較長孖展經驗但產品經驗顯示較基礎，請向客戶確認。'; checks.push({type:'warn',text:t}); consistency.push(t); } else checks.push({type:'ok',text:'檢核5：孖展經驗與產品經驗未觸發提醒。'});
+  if(rank(a[14])>=3&&rank(a[12])===1){ const t='檢核5：有較長孖展經驗但產品經驗選擇「無投資商品」，請向客戶確認。'; checks.push({type:'warn',text:t}); consistency.push(t); } else checks.push({type:'ok',text:'檢核5：孖展經驗與產品經驗未觸發提醒。'});
   return {checks,consistency,age65};
 }
 function loadCompanyCase(){
@@ -591,25 +618,90 @@ function saveCompanyReview(showMessage=false){
   updateCompanyGrade(); updateCredit();
   if(showMessage) document.getElementById('reviewSavedHint').textContent=`已儲存：${new Date(review.savedAt).toLocaleString()}`;
 }
-function downloadSummary(){
-  saveCompanyReview(); const sub=safeParse(localStorage.getItem(SUBMISSION_KEY)); const review=safeParse(localStorage.getItem(REVIEW_KEY)); if(!sub) return;
-  const {total,grade}=calculateSubmission(sub); const ck=getChecks(sub); const other=review?.otherJointGrade||''; const accountGrade=(sub.accountType||'').startsWith('聯名')?(other?higherGrade(grade,other):'待其他聯名戶RPQ完成'):grade;
-  const avail=Math.max((review?.creditLimit||0)-(review?.usedAmount||0),0);
-  const lines=[
-    '富邦證券 — 香港融資 RPQ 結果摘要 (Dual Portal Prototype)',
-    `案件編號：${sub.caseId}`,`帳戶號碼：${sub.accountNo}`,`客戶名稱：${sub.accountName}`,`帳戶類型：${sub.accountType}`,`填寫日期：${sub.fillDate}`,`送出時間：${new Date(sub.submittedAt).toLocaleString()}`,'',
-    '【RPQ 結果】',`總分：${total} / 75`,`本份 RPQ：${grade} ${GRADE_DESC[grade]}`,`帳戶適用風險等級：${accountGrade}`,'',
-    '【各題答案】'
-  ];
-  QUESTIONS.forEach(q=>{ const a=sub.answers[q.id]; lines.push(`Q${q.id}. ${q.text} → ${optionText(q,a)}（${getScore(a)}分）`); });
-  lines.push('','【公司內部檢核】'); ck.checks.forEach(c=>lines.push(c.text));
-  lines.push(`一致性提醒已確認：${review?.consistencyAck?'是':'否'}`,`≥65歲第三方見證事項已確認：${review?.witnessAck?'是':'否'}`,'',
-    '【Margin / Credit Information — 不參與RPQ計分】',`融資額度：HK$ ${(review?.marginFacility||0).toLocaleString()}`,`Credit Limit：HK$ ${(review?.creditLimit||0).toLocaleString()}`,`已動用額度：HK$ ${(review?.usedAmount||0).toLocaleString()}`,`可用額度：HK$ ${avail.toLocaleString()}`,`額度資料日期：${review?.creditDate||''}`,`資料來源/備註：${review?.creditSource||''}`,'',
-    '【公司覆核】',`承辦人：${review?.reviewerName||''}`,`覆核狀態：${review?.reviewStatus||'待覆核'}`,`公司備註：${review?.internalNote||''}`,'',
-    '注意：RPQ 與 Margin/Credit Limit 為不同控制維度；本 Prototype 不應直接作為正式客戶資料保存系統。'
-  );
-  const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`RPQ_${sub.caseId}.txt`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+function printSummary(){
+  saveCompanyReview();
+  const sub=safeParse(localStorage.getItem(SUBMISSION_KEY));
+  const review=safeParse(localStorage.getItem(REVIEW_KEY));
+  if(!sub){ alert('目前沒有可列印的已送出案件。'); return; }
+
+  const {total,grade}=calculateSubmission(sub);
+  const ck=getChecks(sub);
+  const other=review?.otherJointGrade||'';
+  const isJoint=(sub.accountType||'').startsWith('聯名');
+  const accountGrade=isJoint?(other?higherGrade(grade,other):'待其他聯名戶RPQ完成'):grade;
+  const margin=Number(review?.marginFacility||0);
+  const limit=Number(review?.creditLimit||0);
+  const used=Number(review?.usedAmount||0);
+  const avail=Math.max(limit-used,0);
+
+  const rows=QUESTIONS.map(q=>{
+    const a=(sub.answers||{})[q.id]||'';
+    return `<tr><td>Q${q.id}</td><td>${escapeHtml(q.text)}</td><td>${escapeHtml(optionText(q,a))}</td><td style="text-align:center">${getScore(a)}</td></tr>`;
+  }).join('');
+
+  const checkRows=ck.checks.map(c=>`<div class="print-box">${escapeHtml(c.text)}</div>`).join('');
+  const submittedAt=sub.submittedAt?new Date(sub.submittedAt).toLocaleString():'—';
+  const report=document.getElementById('printReport');
+  report.innerHTML=`
+    <h1>富邦證券（香港）客戶投資風險取向分析問卷</h1>
+    <div class="print-sub">Client Investment Risk Preference Questionnaire · 公司審閱摘要</div>
+
+    <div class="print-grid">
+      <div><strong>案件編號：</strong>${escapeHtml(sub.caseId||'—')}</div>
+      <div><strong>填寫日期：</strong>${escapeHtml(sub.fillDate||'—')}</div>
+      <div><strong>帳戶號碼：</strong>${escapeHtml(sub.accountNo||'—')}</div>
+      <div><strong>客戶名稱：</strong>${escapeHtml(sub.accountName||'—')}</div>
+      <div><strong>帳戶類型：</strong>${escapeHtml(sub.accountType||'—')}</div>
+      <div><strong>送出時間：</strong>${escapeHtml(submittedAt)}</div>
+    </div>
+
+    <h2>RPQ 結果</h2>
+    <div class="print-grid">
+      <div><strong>總分：</strong>${total} / 75</div>
+      <div><strong>本份 RPQ：</strong>${escapeHtml(grade)} ${escapeHtml(GRADE_DESC[grade])}</div>
+      <div><strong>帳戶適用風險等級：</strong>${escapeHtml(accountGrade)}</div>
+      ${isJoint?`<div><strong>其他聯名戶最高 RPQ：</strong>${escapeHtml(other||'未提供')}</div>`:''}
+    </div>
+
+    <h2>各題答案</h2>
+    <table>
+      <thead><tr><th style="width:8%">題號</th><th style="width:34%">題目</th><th>答案</th><th style="width:8%">分數</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+
+    <h2>公司內部檢核</h2>
+    ${checkRows}
+    <div class="print-grid">
+      <div><strong>一致性提醒已確認：</strong>${review?.consistencyAck?'是':'否'}</div>
+      <div><strong>≥65歲第三方見證事項已確認：</strong>${review?.witnessAck?'是':'否'}</div>
+    </div>
+
+    <h2>Margin / Credit Information（獨立揭露）</h2>
+    <div class="print-grid">
+      <div><strong>融資額度：</strong>HK$ ${margin.toLocaleString()}</div>
+      <div><strong>Credit Limit：</strong>HK$ ${limit.toLocaleString()}</div>
+      <div><strong>已動用額度：</strong>HK$ ${used.toLocaleString()}</div>
+      <div><strong>可用額度：</strong>HK$ ${avail.toLocaleString()}</div>
+      <div><strong>額度資料日期：</strong>${escapeHtml(review?.creditDate||'—')}</div>
+      <div><strong>資料來源/備註：</strong>${escapeHtml(review?.creditSource||'—')}</div>
+    </div>
+
+    <h2>公司覆核</h2>
+    <div class="print-grid">
+      <div><strong>承辦人：</strong>${escapeHtml(review?.reviewerName||'—')}</div>
+      <div><strong>覆核狀態：</strong>${escapeHtml(review?.reviewStatus||'待覆核')}</div>
+    </div>
+    <div class="print-box"><strong>公司備註：</strong><br>${escapeHtml(review?.internalNote||'—').replace(/\n/g,'<br>')}</div>
+
+    <div class="print-note">注意：RPQ 與 Margin/Credit Limit 為不同控制維度。本 Prototype 僅供流程與畫面驗證，正式上線前應使用公司核准之登入、資料庫、權限及 Audit Trail 機制。</div>
+  `;
+
+  const oldTitle=document.title;
+  document.title=`RPQ_${sub.caseId||'Report'}`;
+  window.print();
+  setTimeout(()=>{ document.title=oldTitle; },500);
 }
+
 function startNewCustomer(){
   if(!confirm('要開始新的客戶問卷嗎？目前已送出案件仍會保留，直到新案件送出或由公司端清除。')) return;
   localStorage.removeItem(DRAFT_KEY); resetCustomerFieldsOnly(); showView('customerView');
