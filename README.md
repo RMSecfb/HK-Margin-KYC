@@ -1,31 +1,48 @@
-# Hong Kong RPQ Prototype v1
+# 香港融資 KYC／RPQ 問卷系統（Prototype v2）
 
-## Files
-- `app.py` — Streamlit main app
-- `rpq_preview.html` — standalone HTML preview
-- `requirements.txt` — Python dependency
+本專案為「富邦證券（香港）客戶投資風險取向分析問卷」的前端流程原型，提供客戶填寫 RPQ 問卷、公司端檢視評分與一致性提醒、記錄覆核，以及列印／儲存 PDF 摘要。**目前為功能展示與流程測試用途，並非正式 KYC／授信作業系統。**
 
-## Run locally
-```bash
-pip install -r requirements.txt
-streamlit run app.py
-```
+## 線上入口
+- [GitHub Pages 測試網站](https://rmsecfb.github.io/HK-Margin-KYC/)
+- 正式網頁入口：`index.html`（GitHub Pages 以儲存庫根目錄發布）
 
-## Streamlit Community Cloud
-Set the main file path to:
+## 功能與流程
+1. **客戶端**：填寫帳戶資料、15 題 RPQ、客戶確認並送出；客戶畫面不顯示評分、風險級距及公司內部檢核。
+2. **公司端**：以測試密碼進入，檢視已送出案件、15 題答案及分數、風險級距、一致性提醒與 Margin／Credit 資訊。
+3. **公司覆核**：填寫覆核人、覆核狀態、內部備註及適用確認事項；可列印或另存 PDF 摘要。
 
-`app.py`
+## RPQ 評分與分級
+- 共 15 題，每題 A/B/C/D/E 對應 1/2/3/4/5 分；總分 15–75。
+- G1：15–30（低風險／保守型）
+- G2：31–45（中風險／平穩型）
+- G3：46–60（高風險／進取型）
+- G4：61–75（極高風險／積極型）
+- 聯名帳戶於取得其他持有人風險級距時，帳戶適用級距採較高者。
+- 一致性提醒不改變 RPQ 原始總分；Margin／Credit 資訊亦不參與 RPQ 評分。
 
-## v1 business rules
-- 15 RPQ questions; A/B/C/D/E = 1/2/3/4/5 points
-- G1: 15–30
-- G2: 31–45
-- G3: 46–60
-- G4: 61–75
-- Age >= 65: internal-rule reminder for independent third-party witness
-- Joint account: internal rule uses the higher RPQ risk grade when the other holder's grade is available
-- Consistency checks are warnings; they do not change RPQ score
-- Margin/Credit information is disclosed separately and does not affect RPQ score or grade
+## 五項公司端檢核
+1. 年齡達 65 歲：提示依內規辦理獨立第三方見證。
+2. 流動資產等級高於淨資產等級：提醒確認 Q4、Q5 填答合理性。
+3. 投資目的較進取而市場知識較低：提醒向客戶確認。
+4. 期望報酬較高而損失承受度偏低：提醒向客戶確認。
+5. 孖展經驗達 3 年以上，但投資產品經驗選「無投資商品」：提醒向客戶確認。
 
-## Prototype note
-This repository is a prototype only. Do not commit real client data. Production use should be approved against the firm's latest Hong Kong Compliance, Credit and Securities Margin Financing policies.
+## 儲存庫檔案
+- `index.html`：GitHub Pages 目前使用的 HTML 前端，**主要維護檔案**。
+- `app.py`：另行保留的 Streamlit／Python 實作，非 GitHub Pages 網站入口。
+- `requirements.txt`：Streamlit 版本的 Python 套件需求。
+- 其他舊版／預覽檔案如仍存在，屬歷史測試用途，不應與 `index.html` 混淆。
+
+## 本機測試
+- 靜態版：直接以瀏覽器開啟 `index.html`；或使用簡易 HTTP server 測試。
+- Streamlit 版（獨立版本）：`pip install -r requirements.txt`，再執行 `streamlit run app.py`。
+
+## 重要限制與資安提醒
+- HTML 原型使用瀏覽器 `localStorage` 儲存草稿、已送出案件及覆核資料，並以 `sessionStorage` 模擬登入狀態。**不同瀏覽器、不同電腦之間不會自動同步案件**。
+- 目前僅模擬單一已送出案件的本機交接；新案件送出可能覆蓋前案。請勿將瀏覽器儲存視為正式資料庫或稽核軌跡。
+- 公司端密碼位於前端原始碼，**不構成正式存取控制**；公開網站亦不適合輸入真實客戶個資、財務資料或帳號。
+- 正式上線前須完成核准的身分驗證、權限控管、後端資料庫、傳輸與儲存保護、稽核紀錄、備份及合規審查。
+- 本專案之規則、分級與流程僅反映現有原型；實際作業仍應依公司最新核准之香港合規、KYC／RPQ 及證券孖展融資制度辦理。
+
+## 版本紀錄
+- 2026-11-07：更新檢核 2 提示文字，明確指向 Q4、Q5；整理 GitHub Pages 專案文件。
