@@ -209,7 +209,7 @@
       <div class="sidebar-fields">
         <div class="field"><label>帳戶號碼 Account No.</label><input id="cAccountNo" type="text" placeholder="請輸入帳戶號碼" oninput="saveDraft(); updateCustomerReady()"></div>
         <div class="field"><label>客戶名稱 Account Name</label><input id="cAccountName" type="text" placeholder="請輸入客戶名稱" oninput="saveDraft(); updateCustomerReady()"></div>
-        <div class="field"><label>帳戶類型 Account Type</label><select id="cAccountType" onchange="saveDraft(); updateCustomerReady()"><option value="個人 Individual">個人 Individual</option><option value="聯名 Joint">聯名 Joint</option></select></div>
+        <div class="field"><label>帳戶類型 Account Type</label><select id="cAccountType" onchange="saveDraft(); updateCustomerReady()"><option value="個人 Individual">個人 Individual</option><option value="關聯 Joint">關聯 Joint</option></select></div>
         <div class="field"><label>填寫日期 Date</label><input id="cFillDate" type="date" onchange="saveDraft(); updateCustomerReady()"></div>
       </div>
       <hr style="border:none;border-top:1px solid #ddd;margin:18px 0;">
@@ -320,7 +320,7 @@
             <div style="font-size:.8rem;color:var(--muted);">帳戶適用風險等級</div>
             <div id="accountGradeDisplay" class="score">—</div>
             <div id="jointCompanyWrap" class="field hidden" style="margin-top:10px;">
-              <label>其他聯名戶最高 RPQ 等級（內規）</label>
+              <label>其他關聯戶最高 RPQ 等級（內規）</label>
               <select id="otherJointGrade" onchange="updateCompanyGrade(); saveCompanyReview()">
                 <option value="">尚未提供</option><option value="G1">G1</option><option value="G2">G2</option><option value="G3">G3</option><option value="G4">G4</option>
               </select>
@@ -580,7 +580,7 @@ function loadCompanyCase(){
   document.getElementById('consistencyAckBox').classList.toggle('hidden',ck.consistency.length===0);
   document.getElementById('witnessAckBox').classList.toggle('hidden',!ck.age65);
 
-  const isJoint=(sub.accountType||'').startsWith('聯名'); document.getElementById('jointCompanyWrap').classList.toggle('hidden',!isJoint);
+  const isJoint=(sub.accountType||'').startsWith('關聯'); document.getElementById('jointCompanyWrap').classList.toggle('hidden',!isJoint);
   const review=safeParse(localStorage.getItem(REVIEW_KEY)); const same=review&&review.caseId===sub.caseId?review:null;
   document.getElementById('otherJointGrade').value=same?.otherJointGrade||'';
   document.getElementById('consistencyAck').checked=!!same?.consistencyAck;
@@ -593,9 +593,9 @@ function loadCompanyCase(){
 function updateCompanyGrade(){
   const sub=safeParse(localStorage.getItem(SUBMISSION_KEY)); if(!sub) return;
   const {grade}=calculateSubmission(sub); const other=document.getElementById('otherJointGrade').value;
-  if((sub.accountType||'').startsWith('聯名')){
-    if(other){ const acct=higherGrade(grade,other); document.getElementById('accountGradeDisplay').textContent=acct; document.getElementById('jointGradeNote').textContent=`本份 RPQ：${grade}；其他聯名戶：${other}；依暫定內規取較高者。`; }
-    else { document.getElementById('accountGradeDisplay').textContent='待確認'; document.getElementById('jointGradeNote').textContent=`本份 RPQ：${grade}；尚缺其他聯名戶 RPQ 等級。`; }
+  if((sub.accountType||'').startsWith('關聯')){
+    if(other){ const acct=higherGrade(grade,other); document.getElementById('accountGradeDisplay').textContent=acct; document.getElementById('jointGradeNote').textContent=`本份 RPQ：${grade}；其他關聯戶：${other}；依暫定內規取較高者。`; }
+    else { document.getElementById('accountGradeDisplay').textContent='待確認'; document.getElementById('jointGradeNote').textContent=`本份 RPQ：${grade}；尚缺其他關聯戶 RPQ 等級。`; }
   } else {
     document.getElementById('accountGradeDisplay').textContent=grade; document.getElementById('jointGradeNote').textContent='個人帳戶：帳戶適用等級即為本份 RPQ 等級。';
   }
@@ -627,8 +627,8 @@ function printSummary(){
   const {total,grade}=calculateSubmission(sub);
   const ck=getChecks(sub);
   const other=review?.otherJointGrade||'';
-  const isJoint=(sub.accountType||'').startsWith('聯名');
-  const accountGrade=isJoint?(other?higherGrade(grade,other):'待其他聯名戶RPQ完成'):grade;
+  const isJoint=(sub.accountType||'').startsWith('關聯');
+  const accountGrade=isJoint?(other?higherGrade(grade,other):'待其他關聯戶RPQ完成'):grade;
   const margin=Number(review?.marginFacility||0);
   const limit=Number(review?.creditLimit||0);
   const used=Number(review?.usedAmount||0);
@@ -660,7 +660,7 @@ function printSummary(){
       <div><strong>總分：</strong>${total} / 75</div>
       <div><strong>本份 RPQ：</strong>${escapeHtml(grade)} ${escapeHtml(GRADE_DESC[grade])}</div>
       <div><strong>帳戶適用風險等級：</strong>${escapeHtml(accountGrade)}</div>
-      ${isJoint?`<div><strong>其他聯名戶最高 RPQ：</strong>${escapeHtml(other||'未提供')}</div>`:''}
+      ${isJoint?`<div><strong>其他關聯戶最高 RPQ：</strong>${escapeHtml(other||'未提供')}</div>`:''}
     </div>
 
     <h2>各題答案</h2>
