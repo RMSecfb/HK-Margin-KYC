@@ -552,7 +552,7 @@ function getChecks(sub){
   const checks=[]; const consistency=[];
   const age65=a[1]==='A';
   checks.push({type:age65?'info':'ok',text:age65?'檢核1：內規提醒—客戶年齡 ≥65 歲，需辦理獨立第三方見證簽署並確認問卷內容。':'檢核1：年齡未達內規第三方見證門檻。'});
-  if(rank(a[4])>rank(a[5])){ const t='檢核2：流動資產等級高於淨資產等級，請確認填寫是否合理。'; checks.push({type:'warn',text:t}); consistency.push(t); } else checks.push({type:'ok',text:'檢核2：流動資產與淨資產等級未觸發提醒。'});
+  if(rank(a[4])>rank(a[5])){ const t='檢核2：流動資產等級高於淨資產等級，請確認Q4、Q5填寫是否合理。'; checks.push({type:'warn',text:t}); consistency.push(t); } else checks.push({type:'ok',text:'檢核2：流動資產與淨資產等級未觸發提醒。'});
   if(rank(a[7])>=4&&rank(a[11])<=2){ const t='檢核3：投資目的較進取但市場知識較低，請向客戶確認。'; checks.push({type:'warn',text:t}); consistency.push(t); } else checks.push({type:'ok',text:'檢核3：投資目的與知識水平未觸發提醒。'});
   if(rank(a[8])>=4&&rank(a[9])<=2){ const t='檢核4：期望報酬較高但可承受損失偏低，請向客戶確認。'; checks.push({type:'warn',text:t}); consistency.push(t); } else checks.push({type:'ok',text:'檢核4：期望報酬與損失承受度未觸發提醒。'});
   if(rank(a[14])>=3&&rank(a[12])===1){ const t='檢核5：有較長孖展經驗但產品經驗選擇「無投資商品」，請向客戶確認。'; checks.push({type:'warn',text:t}); consistency.push(t); } else checks.push({type:'ok',text:'檢核5：孖展經驗與產品經驗未觸發提醒。'});
